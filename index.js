@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import fetch from 'node-fetch';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 
 const client = new Client({
