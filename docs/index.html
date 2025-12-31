@@ -163,15 +163,36 @@
         z-index: 1;
       }
 
-      .card h2 {
-        margin: 0.15rem auto 0;
-        font-size: clamp(1.15rem, 1.7vw, 1.75rem);
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+      }
+
+      .server-title {
+        flex: 1;
+        text-align: center;
+      }
+
+      .server-label {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+      }
+
+            .card h2 {
+        margin: 0;
+        font-size: clamp(1.25rem, 2vw, 1.95rem);
         font-weight: 700;
         text-align: center;
         max-width: 100%;
-        white-space: nowrap;
-        line-height: 1.15;
-        overflow: visible;
+        white-space: normal;
+        line-height: 1.2;
       }
 
       .card.loading {
@@ -193,6 +214,14 @@
         background: rgba(26, 31, 43, 0.8);
       }
 
+      .status-dot {
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 12px currentColor;
+      }
+
       .status-online {
         background: rgba(59, 214, 111, 0.16);
         color: #50f5a6;
@@ -205,14 +234,15 @@
         border-color: rgba(229, 70, 70, 0.45);
       }
 
-      dl {
+      dl.detail-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(206px, 1fr));
-        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.4rem 1.8rem;
         margin: 0;
+        margin-top: clamp(1.6rem, 3vw, 2.1rem);
       }
 
-      dl div {
+      dl.detail-grid div {
         display: flex;
         flex-direction: column;
         gap: 0.35rem;
@@ -231,6 +261,12 @@
         font-weight: 600;
         color: var(--text);
         font-family: var(--font-mono);
+      }
+
+      .detail-large dd {
+        font-size: clamp(1.35rem, 3vw, 1.9rem);
+        font-weight: 700;
+        color: #ffffff;
       }
 
       button.refresh {
@@ -313,8 +349,8 @@
           padding: 2rem 1.4rem;
         }
 
-        dl {
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        dl.detail-grid {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         }
 
         h1 {
@@ -377,8 +413,7 @@
       function renderServer(serverData) {
         const attrs = serverData.attributes;
         const details = attrs.details || {};
-          const serverName = formatValue(attrs.name, "Servidor sin nombre")
-            .replace(/\s*\n\s*/g, " ");
+        const serverName = formatValue(attrs.name, "Servidor sin nombre").replace(/\s*\n\s*/g, " ");
         const statusClass = attrs.status === "online" ? "status-online" : "status-offline";
         const formattedIp = formatValue(attrs.ip, "N/D");
         const formattedPort = formatValue(attrs.port, "-");
@@ -388,17 +423,22 @@
         const displayGame = typeof formattedGame === "string" && formattedGame.toLowerCase() === "dayz"
           ? "DayZ"
           : formattedGame;
+        const statusLabel = attrs.status ? attrs.status.toUpperCase() : "DESCONOCIDO";
 
         statusSection.className = "card";
         statusSection.innerHTML = `
-          <div>
-            <div class="status-chip ${statusClass}">
-              <span>${attrs.status ? attrs.status.toUpperCase() : "DESCONOCIDO"}</span>
+          <header class="card-header">
+            <span class="status-chip ${statusClass}">
+              <span class="status-dot" aria-hidden="true"></span>
+              ${statusLabel}
+            </span>
+            <div class="server-title">
+              <span class="server-label">Servidor</span>
+              <h2>${serverName}</h2>
             </div>
-            <h2>${serverName}</h2>
-          </div>
-          <dl>
-            <div>
+          </header>
+          <dl class="detail-grid">
+            <div class="detail-large">
               <dt>Jugadores</dt>
               <dd>${formatValue(attrs.players, 0)} / ${formatValue(attrs.maxPlayers, "?")}</dd>
             </div>
