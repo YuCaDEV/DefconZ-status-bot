@@ -24,7 +24,7 @@
     }
 
     main {
-      width: min(640px, 100%);
+      width: min(760px, 100%);
       background: rgba(17, 24, 39, 0.7);
       backdrop-filter: blur(12px);
       border-radius: 18px;
@@ -57,10 +57,9 @@
 
     .card h2 {
       margin: 0.6rem 0 0;
-      font-size: clamp(1rem, 2vw, 1.8rem);
+      font-size: clamp(1.2rem, 2.4vw, 2rem);
       font-weight: 700;
-      white-space: nowrap;
-      overflow-x: auto;
+      text-align: center;
     }
 
     .copy-button {
@@ -119,7 +118,7 @@
 
     dl {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 1.2rem;
       margin: 0;
     }
@@ -223,9 +222,11 @@
     function renderServer(serverData) {
       const attrs = serverData.attributes;
       const details = attrs.details || {};
-      const serverName = formatValue(attrs.name, "Servidor sin nombre").replace(/\s*\n\s*/g, " ");
+      const serverName = formatValue(attrs.name, "Servidor sin nombre")
+        .replace(/\s*\n\s*/g, " ")
+        .replace(/\s*\|\s*/g, " | ");
       const statusClass = attrs.status === "online" ? "status-online" : "status-offline";
-      const address = `${formatValue(attrs.ip, "N/D")}:${formatValue(attrs.port, "-")}`;
+      const address = `${formatValue(attrs.ip, "N/D").trim()}:${formatValue(attrs.port, "-").trim()}`;
       const gameIdRaw = serverData.relationships?.game?.data?.id;
       const formattedGame = formatValue(gameIdRaw, "DayZ");
       const displayGame = typeof formattedGame === "string" && formattedGame.toLowerCase() === "dayz"
