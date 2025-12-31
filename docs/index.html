@@ -68,13 +68,13 @@
       main {
         position: relative;
         z-index: 1;
-        width: min(840px, 100%);
-        padding: clamp(2rem, 5vw, 3rem);
-        border-radius: 22px;
+        width: min(880px, 100%);
+        padding: clamp(2.4rem, 6vw, 3.4rem);
+        border-radius: 26px;
         border: 1px solid var(--border);
-        background: linear-gradient(135deg, rgba(229, 70, 70, 0.07), rgba(26, 31, 43, 0.92));
-        backdrop-filter: blur(14px);
-        box-shadow: 0 28px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+        background: linear-gradient(135deg, rgba(229, 70, 70, 0.07), rgba(26, 31, 43, 0.95));
+        backdrop-filter: blur(16px);
+        box-shadow: 0 34px 72px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
       }
 
       h1 {
@@ -97,10 +97,10 @@
       .card {
         position: relative;
         border-radius: 18px;
-        padding: clamp(1.35rem, 3vw, 1.9rem);
+        padding: clamp(1.5rem, 3.4vw, 2.1rem);
         background: rgba(18, 21, 28, 0.88);
         display: grid;
-        gap: 1.15rem;
+        gap: 1.25rem;
         border: 1px solid var(--border);
         box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
         overflow: hidden;
@@ -122,13 +122,13 @@
       }
 
       .card h2 {
-        margin: 0.6rem 0 0;
-        font-size: clamp(1.35rem, 2.8vw, 2.05rem);
+        margin: 0.35rem auto 0;
+        font-size: clamp(1.45rem, 3vw, 2.35rem);
         font-weight: 700;
         text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.35;
       }
 
       .card.loading {
@@ -164,8 +164,8 @@
 
       dl {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.35rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 1.4rem;
         margin: 0;
       }
 
@@ -184,22 +184,22 @@
 
       dd {
         margin: 0;
-        font-size: 1.35rem;
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
         font-weight: 600;
         color: var(--text);
         font-family: var(--font-mono);
       }
 
       button.refresh {
-        margin: 0 auto;
+        margin: 2.2rem auto 0;
         display: block;
-        padding: 0.75rem 2.4rem;
+        padding: 0.8rem 2.6rem;
         border-radius: 999px;
         border: 1px solid transparent;
         font-weight: 600;
         letter-spacing: 0.05em;
         cursor: pointer;
-        font-size: 0.95rem;
+        font-size: 1rem;
         background: linear-gradient(135deg, var(--accent), var(--accent-soft));
         color: #0b0d10;
         transition: transform 0.15s ease, box-shadow 0.2s ease;
@@ -213,10 +213,10 @@
 
       .logo {
         display: block;
-        margin: clamp(1.4rem, 3vw, 2rem) auto 0;
-        max-width: 190px;
-        width: 46%;
-        filter: drop-shadow(0 14px 32px var(--glow));
+        margin: clamp(1.8rem, 3.2vw, 2.4rem) auto 0;
+        max-width: 210px;
+        width: 48%;
+        filter: drop-shadow(0 18px 36px var(--glow));
       }
 
       .copy-button {
@@ -254,10 +254,10 @@
       }
 
       footer {
-        margin-top: clamp(1.8rem, 3.5vw, 2.5rem);
+        margin-top: clamp(1.6rem, 3vw, 2.2rem);
         text-align: center;
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.92rem;
       }
 
       footer a {
@@ -292,6 +292,7 @@
       <footer>
         <span id="updated">Última actualización: --</span><br>
         Fuente: <a href="https://www.battlemetrics.com/" target="_blank" rel="noopener">BattleMetrics</a>
+        • Crafted by <a href="https://github.com/YCOD3V" target="_blank" rel="noopener">Yu</a>
       </footer>
     </main>
 
@@ -325,9 +326,9 @@
       function renderServer(serverData) {
         const attrs = serverData.attributes;
         const details = attrs.details || {};
-        const serverName = formatValue(attrs.name, "Servidor sin nombre")
-          .replace(/\s*\n\s*/g, " ")
-          .replace(/\s*\|\s*/g, " | ");
+          const serverName = formatValue(attrs.name, "Servidor sin nombre")
+            .replace(/\s*\n\s*/g, " ")
+            .replace(/\s*\|\s*/g, " | ");
         const statusClass = attrs.status === "online" ? "status-online" : "status-offline";
         const formattedIp = formatValue(attrs.ip, "N/D");
         const formattedPort = formatValue(attrs.port, "-");
