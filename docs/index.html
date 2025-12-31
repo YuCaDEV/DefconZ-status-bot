@@ -225,7 +225,9 @@
         .replace(/\s*\n\s*/g, " ")
         .replace(/\s*\|\s*/g, " | ");
       const statusClass = attrs.status === "online" ? "status-online" : "status-offline";
-      const address = `${formatValue(attrs.ip, "N/D").trim()}:${formatValue(attrs.port, "-").trim()}`;
+      const formattedIp = formatValue(attrs.ip, "N/D");
+      const formattedPort = formatValue(attrs.port, "-");
+      const address = `${String(formattedIp).trim()}:${String(formattedPort).trim()}`;
       const gameIdRaw = serverData.relationships?.game?.data?.id;
       const formattedGame = formatValue(gameIdRaw, "DayZ");
       const displayGame = typeof formattedGame === "string" && formattedGame.toLowerCase() === "dayz"
