@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estado del servidor DayZ</title>
+  <style>
+    :root {
+      color-scheme: dark light;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      background: linear-gradient(160deg, #1f2937 0%, #0f172a 100%);
+    }
+
+    main {
+      width: min(640px, 100%);
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    p.description {
+      margin: 0 0 2.25rem;
+      text-align: center;
+      color: #cbd5f5;
+    }
+
+    .card {
+      border-radius: 16px;
+      padding: 1.5rem;
+      background: rgba(30, 41, 59, 0.9);
+      display: grid;
+      gap: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .card.loading {
+      text-align: center;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .status-online {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+    }
+
+    .status-offline {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.2rem;
+      margin: 0;
+    }
+
+    dt {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0.15rem 0 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    button.refresh {
+      margin: 0 auto;
+      display: block;
+      padding: 0.65rem 1.4rem;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      background: #38bdf8;
+      color: #0f172a;
+      transition: transform 0.1s ease-in-out, background 0.2s;
+    }
+
+    button.refresh:hover {
+      transform: translateY(-1px);
+      background: #0ea5e9;
+    }
+
+    .error {
+      color: #f87171;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Estado del servidor DayZ</h1>
+    <p class="description">Datos en vivo obtenidos desde BattleMetrics. Usa <code>?serverId=ID</code> o <code>?search=consulta</code> para personalizar.</p>
+
+    <section id="status" class="card loading">Cargando datos del servidor…</section>
+
+    <button type="button" class="refresh" id="refresh">Actualizar ahora</button>
+    <footer>
+      <span id="updated">Última actualización: --</span><br>
+      Fuente: <a href="https://www.battlemetrics.com/" target="_blank" rel="noopener">BattleMetrics</a>
+    </footer>
+  </main>
+
+  <script>
+    const API_BASE = "https://api.battlemetrics.com/servers";
+    const DEFAULT_SEARCH = "DefconZ";
+    const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
+    const statusSection = document.getElementById("status");
+    const updatedLabel = document.getElementById("updated");
+    const refreshButton = document.getElementById("refresh");
+
+    // Small helper to normalize optional values so the UI stays clean.
+    function formatValue(value, fallback = "-") {
+      if (value === null || value === undefined || value === "") {
+        return fallback;
+      }
+      return value;
+    }
+
+    function renderLoading() {
+      statusSection.className = "card loading";
+      statusSection.textContent = "Actualizando datos…";
+    }
+
+    function renderError(message) {
+      statusSection.className = "card";
+      statusSection.innerHTML = `<div class="error">${message}</div>`;
+    }
+
+    function renderServer(serverData) {
+      const attrs = serverData.attributes;
+      const details = attrs.details || {};
+      const statusClass = attrs.status === "online" ? "status-online" : "status-offline";
+
+      statusSection.className = "card";
+      statusSection.innerHTML = `
+        <div>
+          <div class="status-chip ${statusClass}">
+            <span>${attrs.status ? attrs.status.toUpperCase() : "DESCONOCIDO"}</span>
+          </div>
+          <h2>${formatValue(attrs.name, "Servidor sin nombre")}</h2>
+        </div>
+        <dl>
+          <div>
+            <dt>Jugadores</dt>
+            <dd>${formatValue(attrs.players, 0)} / ${formatValue(attrs.maxPlayers, "?")}</dd>
+          </div>
+          <div>
+            <dt>Dirección</dt>
+            <dd>${formatValue(attrs.ip, "N/D")}:${formatValue(attrs.port, "-")}</dd>
+          </div>
+          <div>
+            <dt>Mapa</dt>
+            <dd>${formatValue(details.map, "No informado")}</dd>
+          </div>
+          <div>
+            <dt>Game</dt>
+            <dd>${formatValue(serverData.relationships?.game?.data?.id, "Desconocido")}</dd>
+          </div>
+          <div>
+            <dt>Rank</dt>
+            <dd>${formatValue(attrs.rank, "-")}</dd>
+          </div>
+          <div>
+            <dt>Último reinicio</dt>
+            <dd>${formatValue(details.lastWipe, "No informado")}</dd>
+          </div>
+        </dl>
+      `;
+    }
+
+    async function fetchByServerId(serverId) {
+      const response = await fetch(`${API_BASE}/${encodeURIComponent(serverId)}`);
+      if (!response.ok) {
+        throw new Error("No se pudo cargar el servidor.");
+      }
+      const json = await response.json();
+      return json.data;
+    }
+
+    async function fetchBySearch(query) {
+      const response = await fetch(`${API_BASE}?filter[search]=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error("No se pudo realizar la búsqueda en BattleMetrics.");
+      }
+      const json = await response.json();
+      if (!json.data || json.data.length === 0) {
+        throw new Error("No se encontraron servidores con esa búsqueda.");
+      }
+      return json.data[0];
+    }
+
+    async function updateStatus() {
+      try {
+        renderLoading();
+        const params = new URLSearchParams(window.location.search);
+        const serverId = params.get("serverId");
+        const searchQuery = params.get("search") || DEFAULT_SEARCH;
+
+        const serverData = serverId
+          ? await fetchByServerId(serverId)
+          : await fetchBySearch(searchQuery);
+
+        renderServer(serverData);
+        const timestamp = new Date().toLocaleString("es-CL", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          day: "2-digit",
+          month: "2-digit"
+        });
+        updatedLabel.textContent = `Última actualización: ${timestamp}`;
+      } catch (error) {
+        renderError(error.message || "Error inesperado al cargar el estado.");
+      }
+    }
+
+    refreshButton.addEventListener("click", updateStatus);
+    updateStatus();
+    setInterval(updateStatus, REFRESH_INTERVAL_MS);
+  </script>
+</body>
+</html>
