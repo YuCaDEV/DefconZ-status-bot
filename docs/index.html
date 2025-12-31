@@ -154,7 +154,7 @@
 
   <script>
     const API_BASE = "https://api.battlemetrics.com/servers";
-    const DEFAULT_SEARCH = "DefconZ";
+    const DEFAULT_SERVER_ID = "33716617";
     const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
     const statusSection = document.getElementById("status");
@@ -246,8 +246,8 @@
       try {
         renderLoading();
         const params = new URLSearchParams(window.location.search);
-        const serverId = params.get("serverId");
-        const searchQuery = params.get("search") || DEFAULT_SEARCH;
+        const serverId = params.get("serverId") || DEFAULT_SERVER_ID;
+        const searchQuery = params.get("search");
 
         const serverData = serverId
           ? await fetchByServerId(serverId)
