@@ -57,5 +57,5 @@ client.once('ready', () => {
   setInterval(updateMessage, 30 * 60 * 1000);
 });
 
-console.log("TOKEN:", process.env.DISCORD_TOKEN);
-client.login(process.env.TOKEN)
+console.log('TOKEN:', process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN);

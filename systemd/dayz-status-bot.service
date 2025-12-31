@@ -1,0 +1,17 @@
+[Unit]
+Description=DayZ Status Discord Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/dayz-status-bot
+EnvironmentFile=/opt/dayz-status-bot/.env
+ExecStart=/usr/bin/node /opt/dayz-status-bot/index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
